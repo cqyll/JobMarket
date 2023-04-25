@@ -1,0 +1,79 @@
+---
+title: "Covid"
+author: "Mahd Sardar"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggplot2)
+
+```
+
+```{r}
+df_covid2020 <- read_csv("C:\\Users\\smf19\\OneDrive\\Desktop\\OxCGRT_CAN_differentiated_withnotes_2020.csv")
+
+
+df_covid_filtered2020 <- df_covid2020 %>%
+  select(c(CountryName, RegionName, Jurisdiction, starts_with("StringencyIndex"), Date)) %>%
+  mutate(across(c(CountryName, RegionName, Jurisdiction), as.factor)) %>%
+  filter(Jurisdiction == "NAT_TOTAL") %>%
+  select(-c(RegionName))
+
+final_covid2020 <- df_covid_filtered2020 %>%
+  select(c(Date, CountryName, Jurisdiction, starts_with("StringencyIndex_Weighted"))) %>%
+  mutate(Date = as.Date(as.character(Date), format="%Y%m%d")) %>%
+  group_by(CountryName, Jurisdiction, format(Date, "%Y-%m")) %>%
+  summarize(StringencyIndex_WeightedAverage = mean(StringencyIndex_WeightedAverage, na.rm = TRUE)) %>%
+  ungroup()
+
+
+df_covid2021 <- read_csv("C:\\Users\\smf19\\OneDrive\\Desktop\\OxCGRT_CAN_differentiated_withnotes_2021.csv")
+
+
+df_covid_filtered2021 <- df_covid2021 %>%
+  select(c(CountryName, RegionName, Jurisdiction, starts_with("StringencyIndex"), Date)) %>%
+  mutate(across(c(CountryName, RegionName, Jurisdiction), as.factor)) %>%
+  filter(Jurisdiction == "NAT_TOTAL") %>%
+  select(-c(RegionName))
+
+final_covid2021 <- df_covid_filtered2021 %>%
+  select(c(Date, CountryName, Jurisdiction, starts_with("StringencyIndex_Weighted"))) %>%
+  mutate(Date = as.Date(as.character(Date), format="%Y%m%d")) %>%
+  group_by(CountryName, Jurisdiction, format(Date, "%Y-%m")) %>%
+  summarize(StringencyIndex_WeightedAverage = mean(StringencyIndex_WeightedAverage, na.rm = TRUE)) %>%
+  ungroup()
+
+df_covid2022 <- read_csv("C:\\Users\\smf19\\OneDrive\\Desktop\\OxCGRT_CAN_differentiated_withnotes_2022.csv")
+
+
+df_covid_filtered2022 <- df_covid2022 %>%
+  select(c(CountryName, RegionName, Jurisdiction, starts_with("StringencyIndex"), Date)) %>%
+  mutate(across(c(CountryName, RegionName, Jurisdiction), as.factor)) %>%
+  filter(Jurisdiction == "NAT_TOTAL") %>%
+  select(-c(RegionName))
+
+final_covid2022 <- df_covid_filtered2022 %>%
+  select(c(Date, CountryName, Jurisdiction, starts_with("StringencyIndex_Weighted"))) %>%
+  mutate(Date = as.Date(as.character(Date), format="%Y%m%d")) %>%
+  group_by(CountryName, Jurisdiction, format(Date, "%Y-%m")) %>%
+  summarize(StringencyIndex_WeightedAverage = mean(StringencyIndex_WeightedAverage, na.rm = TRUE)) %>%
+  ungroup()
+
+df_covid_yearly <- final_covid2020 %>%
+  rbind(., final_covid2021) %>%
+  rbind(., final_covid2022) %>%
+  mutate(`year_month` = as.Date(as.character(`format(Date, "%Y-%m")`), format = "%Y")) %>%
+  group_by(CountryName, Jurisdiction, format(`year_month`, "%Y")) %>%
+  summarize(StringencyIndex_WeightedAverage = mean(StringencyIndex_WeightedAverage, na.rm = TRUE)) %>%
+  ungroup()
+
+
+
+
+
+  
+```
+
